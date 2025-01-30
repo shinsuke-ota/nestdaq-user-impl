@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "header",
+  "definitions": {
+    "version": {
+      "type": "integer",
+      "description": "Version",
+      "bitLength": 8
+    },
+    "magic": {
+      "type": "integer",
+      "description": "Magic number",
+      "bitLength": 56
+    },
+    "length": {
+      "type": "integer",
+      "description": "Length (in bytes)",
+      "bitLength": 32
+    },
+    "headerLength": {
+      "type": "integer",
+      "description": "Header length (in bytes)",
+      "bitLength": 16
+    },
+    "status": {
+      "type": "integer",
+      "description": "Status",
+      "bitLength": 16
+    },
+    "type": {
+      "type": "integer",
+      "description": "Type",
+      "bitLength": 32
+    },
+    "reserved": {
+      "type": "integer",
+      "description": "Reserved",
+      "bitLength": 32
+    },
+    "banks": {
+      "type":"array",
+      "items": {
+        "$ref": "header.json#/definitions/bank"
+      }
+    },
+    "$defs": {
+      "bank": {
+        "type": "object",
+        "required": [
+          "length","bankname","data"
+        ],
+        "properties": {
+          "length": {
+            "type": "integer",
+            "description": "Length of the bank",
+            "bitLength": 32
+          },
+          "bankname": {
+            "type": "string",
+            "description": "Bank name",
+            "bitLength": 32
+          },
+          "data": {
+            "type": "integer",
+            "description": "Bank data",
+            "bitLength": 64
+          }
+        }
+      }
+    }
+
+  }
+}
