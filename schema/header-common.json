@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "header",
-  "type": "object",
+  "title": "CommonHeaderDefinitions",
   "definitions": {
     "version": {
       "type": "integer",
@@ -9,17 +8,9 @@
       "bitLength": 8
     },
     "magic": {
-      "type": "string",
-      "description": "magic word as a delimitor of the data structure and showing how to analyze the data structure with help of type",
-      "bitLength": 56,
-      "maxLength": 7,
-      "enum" : [
-        "TIMEFRM",
-        "SUBTIME",
-        "HRTBEAT",
-        "FLTLOGI",
-        "TRGTIME"
-      ]
+      "type": "integer",
+      "description": "Magic number",
+      "bitLength": 56
     },
     "length": {
       "type": "integer",
@@ -41,16 +32,20 @@
       "description": "Type",
       "bitLength": 32
     },
-    "reserved": {
+    "elapsedTime": {
       "type": "integer",
-      "description": "Reserved",
+      "description": "Elapsed time",
       "bitLength": 32
     },
-    "banks": {
-      "type":"array",
-      "items": {
-        "$ref": "header-extra-bank.json#/definitions/bank"
-      }
+    "epochTimeSec": {
+      "type": "integer",
+      "description": "Linux Epoch Time in seconds",
+      "bitLength": 64
+    },
+    "epochTimeUSec": {
+      "type": "integer",
+      "description": "Linux Epoch Time in microseconds",
+      "bitLength": 64
     }
   }
 }

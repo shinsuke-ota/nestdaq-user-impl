@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FileSinkHeader",
+  "type": "object",
+  "definitions": {
+    "v0": {
+      "type": "object",
+      "properties": {
+        "magic": { 
+          "type": "integer", 
+          "description": "Magic number", 
+          "bitLength": 64 
+        },
+        "size": { 
+          "type": "integer", 
+          "description": "Size", 
+          "bitLength": 64 
+        },
+        "fairMQDeviceType": { 
+          "type": "integer", 
+          "description": "FairMQ device type", 
+          "bitLength": 64 
+        },
+        "runNumber": { 
+          "type": "integer", 
+          "description": "Run number", 
+          "bitLength": 64 
+        },
+        "startUnixTime": { 
+          "type": "integer", 
+          "description": "Start Unix time", 
+          "bitLength": 64 
+        },
+        "stopUnixTime": { 
+          "type": "integer", 
+          "description": "Stop Unix time", 
+          "bitLength": 64 
+        },
+        "comments": { 
+          "type": "string", 
+          "description": "Comments", 
+          "bitLength": 8 
+        }
+      },
+      "required": [
+        "magic", 
+        "size", 
+        "fairMQDeviceType", 
+        "runNumber", 
+        "startUnixTime", 
+        "stopUnixTime", 
+        "comments"
+      ]
+    },
+    "v1": {
+      "type": "object",
+      "properties": {
+        "magic": { "$ref": "header-common.json#/definitions/magic" },
+        "length": { "$ref": "header-common.json#/definitions/length" },
+        "headerLength": { "$ref": "header-common.json#/definitions/headerLength" },
+        "type": { "$ref": "header-common.json#/definitions/type" },
+        "fairMQDeviceType": { 
+          "type": "integer", 
+          "description": "FairMQ device type", 
+          "bitLength": 64 
+        },
+        "runNumber": { 
+          "type": "integer", 
+          "description": "Run number", 
+          "bitLength": 64 
+        },
+        "startUnixTime": { 
+          "type": "integer", 
+          "description": "Start Unix time", 
+          "bitLength": 64 
+        },
+        "stopUnixTime": { 
+          "type": "integer", 
+          "description": "Stop Unix time", 
+          "bitLength": 64 
+        },
+        "comments": { 
+          "type": "string", 
+          "description": "Comments", 
+          "bitLength": 8 
+        }
+      },
+      "required": [
+        "magic", 
+        "size", 
+        "length", 
+        "headerLength", 
+        "type", 
+        "fairMQDeviceType", 
+        "runNumber", 
+        "startUnixTime", 
+        "stopUnixTime", 
+        "comments"
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SubTimeFrameHeader",
+  "type": "object",
+  "definitions": {
+    "v0": {
+      "type": "object",
+      "properties": {
+        "magic": { 
+          "type": "integer", 
+          "description": "Magic number", 
+          "bitLength": 64 
+        },
+        "timeFrameId": { 
+          "type": "integer", 
+          "description": "Time frame ID", 
+          "bitLength": 32 
+        },
+        "reserved": { 
+          "type": "integer", 
+          "description": "Reserved", 
+          "bitLength": 32 
+        },
+        "femType": { 
+          "type": "integer", 
+          "description": "FEM type", 
+          "bitLength": 32 
+        },
+        "femId": { 
+          "type": "integer", 
+          "description": "FEM ID", 
+          "bitLength": 32 
+        },
+        "length": { 
+          "type": "integer", 
+          "description": "Length", 
+          "bitLength": 32 
+        },
+        "numMessages": { 
+          "type": "integer", 
+          "description": "Number of messages", 
+          "bitLength": 32 
+        },
+        "timeSec": { 
+          "type": "integer", 
+          "description": "Time in seconds", 
+          "bitLength": 64 
+        },
+        "timeUSec": { 
+          "type": "integer", 
+          "description": "Time in microseconds", 
+          "bitLength": 64 
+        }
+      },
+      "required": [
+        "magic", 
+        "timeFrameId", 
+        "reserved", 
+        "femType", 
+        "femId", 
+        "length", 
+        "numMessages", 
+        "timeSec", 
+        "timeUSec"
+      ]
+    },
+    "v1": {
+      "type": "object",
+      "properties": {
+        "magic": { "$ref": "header-common.json#/definitions/magic" },
+        "length": { "$ref": "header-common.json#/definitions/length" },
+        "headerLength": { "$ref": "header-common.json#/definitions/headerLength" },
+        "type": { "$ref": "header-common.json#/definitions/type" },
+        "timeFrameId": { 
+          "type": "integer", 
+          "description": "Time frame ID", 
+          "bitLength": 32 
+        },
+        "femType": { 
+          "type": "integer", 
+          "description": "FEM type", 
+          "bitLength": 32 
+        },
+        "femId": { 
+          "type": "integer", 
+          "description": "FEM ID", 
+          "bitLength": 32 
+        },
+        "numMessages": { 
+          "type": "integer", 
+          "description": "Number of messages", 
+          "bitLength": 32 
+        },
+        "timeSec": { 
+          "type": "integer", 
+          "description": "Time in seconds", 
+          "bitLength": 64 
+        },
+        "timeUSec": { 
+          "type": "integer", 
+          "description": "Time in microseconds", 
+          "bitLength": 64 
+        }
+      },
+      "required": [
+        "magic", 
+        "length", 
+        "headerLength", 
+        "type", 
+        "timeFrameId", 
+        "femType", 
+        "femId", 
+        "numMessages", 
+        "timeSec", 
+        "timeUSec"
+      ]
+    }
+  }
+}

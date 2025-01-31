@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TimeFrameHeader",
+  "type": "object",
+  "definitions": {
+    "v0": {
+      "type": "object",
+      "properties": {
+        "magic": {
+          "type": "integer",
+          "description": "Magic number identifying the header",
+          "bitLength": 64
+        },
+        "timeFrameId": {
+          "type": "integer",
+          "description": "Identifier for the time frame",
+          "bitLength": 32
+        },
+        "numSource": {
+          "type": "integer",
+          "description": "Number of sources in the time frame",
+          "bitLength": 32
+        },
+        "length": {
+          "type": "integer",
+          "description": "Total length of the time frame",
+          "bitLength": 64
+        }
+      },
+      "required": ["magic", "timeFrameId", "numSource", "length"]
+    },
+    "v1": {
+      "type": "object",
+      "properties": {
+        "version": { "$ref": "header-common.json#/definitions/version" },
+        "magic": { "$ref": "header-common.json#/definitions/magic" },
+        "length": { "$ref": "header-common.json#/definitions/length" },
+        "hLength": { "$ref": "header-common.json#/definitions/headerLength" },
+        "status": { "$ref": "header-common.json#/definitions/status" },
+        "type": { "$ref": "header-common.json#/definitions/type" },
+        "elapsedTime": { "$ref": "header-common.json#/definitions/elapsedTime" },
+        "epochTimeSec": { "$ref": "header-common.json#/definitions/epochTimeSec" },
+        "epochTimeUSec": { "$ref": "header-common.json#/definitions/epochTimeUSec" },
+        "delim": {
+          "type": "integer",
+          "description": "Delimiter",
+          "bitLength": 16
+        },
+        "dataLength" : {
+          "type": "integer",
+          "description": "Bank number",
+          "bitLength": 16
+        },
+        "bank" : {
+          "type": "integer",
+          "description": "Bank number (string でかけるようにはなっていた）",
+          "bitLength": 32
+        },
+        "data" : {
+          "type": "integer",
+          "description": "Data",
+          "bitLength": 32
+        },
+        "timeFrameId": { 
+          "type": "integer", 
+          "description": "Identifier for the time frame", 
+          "bitLength": 32 
+        },
+        "numSource": {
+          "type": "integer",
+          "description": "Number of sources in the time frame (なくてもいいかも)",
+          "bitLength": 32
+        }
+      },
+      "required": ["magic", "length", "hLength", "type", "timeFrameId", "numSource"]
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/v0" },
+    { "$ref": "#/definitions/v1" }
+  ]
+}

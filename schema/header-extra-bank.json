@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "bank",
+  "type": "object",
+  "definitions": {
+    "dataLength": {
+      "type": "integer",
+      "description": "data length including headers",
+      "bitLength": 32
+    },
+    "bank": {
+      "type": "string",
+      "description": "Bank string",
+      "bitLength": 32
+    },
+    "data": {
+      "type": "integer",
+      "description": "Data",
+      "bitLength": 64
+    }
+  },
+  "required": ["dataLength", "bank", "data"]
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CommonHeaderDefinitions",
+  "definitions": {
+    "headerDelimiters": {
+      "type": "integer",
+      "description": "Header delimiters",
+      "bitLength": 32
+    },
+    "layer": {
+      "type": "integer",
+      "description": "Layer",
+      "bitLength": 8
+    },
+    "type": {
+      "type": "integer",
+      "description": "Type",
+      "bitLength": 16
+    },
+    "version": {
+      "type": "integer",
+      "description": "Version",
+      "bitLength": 8
+    },
+    "magic": {
+      "type": "integer",
+      "description": "Magic number",
+      "bitLength": 64
+    },
+    "length": {
+      "type": "integer",
+      "description": "Length (in bytes)",
+      "bitLength": 32
+    },
+    "status": {
+      "type": "integer",
+      "description": "Status",
+      "bitLength": 16
+    },
+    "headerLength": {
+      "type": "integer",
+      "description": "Header length (in bytes)",
+      "bitLength": 16
+    },
+    "elapsedTime": {
+      "type": "integer",
+      "description": "Elapsed time",
+      "bitLength": 64
+    },
+    "epochTimeSec": {
+      "type": "integer",
+      "description": "Linux Epoch Time in seconds",
+      "bitLength": 64
+    },
+    "epochTimeUSec": {
+      "type": "integer",
+      "description": "Linux Epoch Time in microseconds",
+      "bitLength": 64
+    }
+  }
+}
