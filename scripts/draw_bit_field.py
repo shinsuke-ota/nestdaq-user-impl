@@ -2,26 +2,73 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
+import argparse
+
+# 引数を解析
+parser = argparse.ArgumentParser(description='Draw bit field diagram from JSON schema.')
+parser.add_argument('input_file', type=str, help='Path to the input JSON schema file')
+parser.add_argument('output_file', type=str, help='Path to the output diagram file')
+parser.add_argument('--version', type=str, help='Schema version to use (e.g., v0, v1)', default=None)
+args = parser.parse_args()
 
 # JSONファイルを読み込む
-with open('/home/ota/repos/nestdaq-user-impl/schema/header.json', 'r') as f:
+with open(args.input_file, 'r') as f:
     schema = json.load(f)
 
-properties = schema['definitions']
+# バージョンが指定されている場合、そのバージョンの定義を使用
+if args.version:
+    properties = schema['definitions'][args.version]['properties']
+else:
+    properties = schema['properties']
 
 # 参照を解決する関数
 def resolve_ref(ref):
+    """
+    Resolves a JSON reference to its corresponding property.
+
+    This function handles both internal references (starting with '#') and external references
+    (containing a file path and a reference path separated by '#').
+
+    Args:
+        ref (str): The JSON reference to resolve. It can be an internal reference (e.g., '#/definitions/Property')
+                   or an external reference (e.g., 'file.json#/definitions/Property').
+
+    Returns:
+        dict: The resolved property from the JSON schema.
+
+    Raises:
+        KeyError: If the reference path does not exist in the properties.
+        FileNotFoundError: If the external reference file does not exist.
+        json.JSONDecodeError: If the external reference file is not a valid JSON.
+    """
     if ref.startswith('#'):
         ref_path = ref.split('/')[-1]
         return properties[ref_path]
     else:
         ref_file, ref_path = ref.split('#')
-        ref_file = os.path.join(os.path.dirname('/home/ota/repos/nestdaq-user-impl/schema/header.json'), ref_file)
+        ref_file = os.path.join(os.path.dirname(args.input_file), ref_file)
         with open(ref_file, 'r') as f:
             ref_schema = json.load(f)
-        ref_properties = ref_schema['definitions']
+        ref_properties = ref_schema['properties']
         ref_path = ref_path.split('/')[-1]
         return ref_properties[ref_path]
+
+
+def calculate_bit_length(details):
+    print(details)
+    if '$ref' in details:
+        ref_details = resolve_ref(details['$ref'])
+        return ref_details['bitLength']
+    if details['type'] == 'object':
+        return 0
+    if details['type'] == 'array':
+        items_ref = details['items'].get('$ref')
+        if items_ref:
+            ref_details = resolve_ref(items_ref)
+            return ref_details['bitLength']
+        return 0
+    return details['bitLength']
+
 
 # 画像の設定
 bit_width = 10
@@ -29,7 +76,11 @@ bit_height = 20
 margin = 1
 
 # ビット列の総数を計算
-total_bits = sum(details['bitLength'] for details in properties.values() if details['type'] != 'array' and details['type'] != 'object')
+total_bits = 0
+
+for prop, details in properties.items():
+    total_bits += calculate_bit_length(details)
+
 rows = (total_bits + 63) // 64  # 64ビットごとに改行
 
 # キャンバスのサイズを設定
@@ -60,43 +111,54 @@ for i in range(64):
 x = margin
 y -= bit_height
 
+def draw_bit_field(x, y, bit_length, prop_name, bit_position, is_array=False):
+    remaining_bits = 64 - (bit_position % 64)
+    if bit_length > remaining_bits:
+        # Draw the first part
+        rect = patches.Rectangle((x, y), remaining_bits * bit_width, bit_height, linewidth=1, edgecolor='black', facecolor='none')
+        ax.add_patch(rect)
+        label = f"{prop_name}[]" if is_array else prop_name
+        fontsize = min(remaining_bits * bit_width, bit_height) * 3  # Adjust font size to fit within the box
+        ax.text(x + (remaining_bits * bit_width) / 2, y + bit_height / 2, label, ha='center', va='center', fontsize=fontsize)
+        
+        # Move to the next line
+        x = margin
+        y -= bit_height
+        bit_length -= remaining_bits
+        bit_position += remaining_bits
+    else:
+        remaining_bits = bit_length
+
+    # Draw the remaining part
+    rect = patches.Rectangle((x, y), remaining_bits * bit_width, bit_height, linewidth=1, edgecolor='black', facecolor='none')
+    ax.add_patch(rect)
+    label = f"{prop_name}[]" if is_array else prop_name
+    fontsize = min(remaining_bits * bit_width, bit_height) * 3  # Adjust font size to fit within the box
+    ax.text(x + (remaining_bits * bit_width) / 2, y + bit_height / 2, label, ha='center', va='center', fontsize=fontsize)
+    
+    return x + remaining_bits * bit_width, y, bit_position + remaining_bits
+
 for prop, details in properties.items():
+    if '$ref' in details:
+        details = resolve_ref(details['$ref'])
     if details['type'] == 'object':
         continue
     if details['type'] == 'array':
-        # 配列の場合は1回だけ内容を表示
         items_ref = details['items'].get('$ref')
         if items_ref:
             ref_details = resolve_ref(items_ref)
             bit_length = ref_details['bitLength']
-            description = ref_details['description']
-        
-        rect = patches.Rectangle((x, y), bit_length * bit_width, bit_height, linewidth=1, edgecolor='black', facecolor='none')
-        ax.add_patch(rect)
-        fontsize = min(bit_length * bit_width, bit_height) * 3  # Adjust font size to fit within the box
-        ax.text(x + (bit_length * bit_width) / 2, y + bit_height / 2, f"{prop}[]", ha='center', va='center', fontsize=fontsize)
-        x += bit_length * bit_width
-        bit_position += bit_length
-        if bit_position % 64 == 0:
-            x = margin
-            y -= bit_height
+            x, y, bit_position = draw_bit_field(x, y, bit_length, prop, bit_position, is_array=True)
+            if bit_position % 64 == 0:
+                x = margin
+                y -= bit_height
         continue
     bit_length = details['bitLength']
-    description = details['description']
-    
-    # ビット列を描画
-    rect = patches.Rectangle((x, y), bit_length * bit_width, bit_height, linewidth=1, edgecolor='black', facecolor='none')
-    ax.add_patch(rect)
-    # プロパティ名を四角の中心に真ん中揃えで描画
-    fontsize = min(bit_length * bit_width, bit_height) * 3  # Adjust font size to fit within the box
-    ax.text(x + (bit_length * bit_width) / 2, y + bit_height / 2, prop, ha='center', va='center', fontsize=fontsize)
-    x += bit_length * bit_width
-    bit_position += bit_length
-    
+    x, y, bit_position = draw_bit_field(x, y, bit_length, prop, bit_position)
     if bit_position % 64 == 0:
         x = margin
         y -= bit_height
 
 # 画像を保存
-plt.savefig('/home/ota/repos/nestdaq-user-impl/output/bit_field_diagram.pdf', format='pdf')
+plt.savefig(args.output_file, format='pdf')
 plt.close()

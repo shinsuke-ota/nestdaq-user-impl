@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "FileSinkHeader",
   "type": "object",
+  "oneOf" : [
+    { "$ref": "#/definitions/v0" },
+    { "$ref": "#/definitions/v1" }
+  ],
   "definitions": {
     "v0": {
       "type": "object",
@@ -38,8 +42,9 @@
         },
         "comments": { 
           "type": "string", 
-          "description": "Comments", 
-          "bitLength": 8 
+          "description": "Comments .. (256 characters) ", 
+          "bitLength": 64,
+          "maxLength": 256
         }
       },
       "required": [
@@ -55,10 +60,11 @@
     "v1": {
       "type": "object",
       "properties": {
-        "magic": { "$ref": "header-common.json#/definitions/magic" },
-        "length": { "$ref": "header-common.json#/definitions/length" },
-        "headerLength": { "$ref": "header-common.json#/definitions/headerLength" },
-        "type": { "$ref": "header-common.json#/definitions/type" },
+        "version": { "$ref": "header-common.json#/properties/version" },
+        "magic": { "$ref": "header-common.json#/properties/magic" },
+        "length": { "$ref": "header-common.json#/properties/length" },
+        "headerLength": { "$ref": "header-common.json#/properties/headerLength" },
+        "type": { "$ref": "header-common.json#/properties/type" },
         "fairMQDeviceType": { 
           "type": "integer", 
           "description": "FairMQ device type", 
@@ -81,11 +87,13 @@
         },
         "comments": { 
           "type": "string", 
-          "description": "Comments", 
-          "bitLength": 8 
+          "description": "Comments .. (256 characters) ", 
+          "bitLength": 64,
+          "maxLength": 256
         }
       },
       "required": [
+        "version",
         "magic", 
         "size", 
         "length", 

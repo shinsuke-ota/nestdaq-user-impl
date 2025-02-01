@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CommonHeaderDefinitions",
-  "definitions": {
+  "properties": {
     "version": {
       "type": "integer",
       "description": "Version",
@@ -22,30 +22,10 @@
       "description": "Header length (in bytes)",
       "bitLength": 16
     },
-    "status": {
-      "type": "integer",
-      "description": "Status",
-      "bitLength": 16
-    },
     "type": {
       "type": "integer",
       "description": "Type",
-      "bitLength": 32
-    },
-    "elapsedTime": {
-      "type": "integer",
-      "description": "Elapsed time",
-      "bitLength": 32
-    },
-    "epochTimeSec": {
-      "type": "integer",
-      "description": "Linux Epoch Time in seconds",
-      "bitLength": 64
-    },
-    "epochTimeUSec": {
-      "type": "integer",
-      "description": "Linux Epoch Time in microseconds",
-      "bitLength": 64
+      "bitLength": 16
     }
   }
 }

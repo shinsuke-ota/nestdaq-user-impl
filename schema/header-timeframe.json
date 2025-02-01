@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "TimeFrameHeader",
   "type": "object",
+  "oneOf": [
+    { "$ref": "#/definitions/v0" },
+    { "$ref": "#/definitions/v1" }
+  ],
   "definitions": {
     "v0": {
       "type": "object",
@@ -36,31 +40,7 @@
         "magic": { "$ref": "header-common.json#/definitions/magic" },
         "length": { "$ref": "header-common.json#/definitions/length" },
         "hLength": { "$ref": "header-common.json#/definitions/headerLength" },
-        "status": { "$ref": "header-common.json#/definitions/status" },
         "type": { "$ref": "header-common.json#/definitions/type" },
-        "elapsedTime": { "$ref": "header-common.json#/definitions/elapsedTime" },
-        "epochTimeSec": { "$ref": "header-common.json#/definitions/epochTimeSec" },
-        "epochTimeUSec": { "$ref": "header-common.json#/definitions/epochTimeUSec" },
-        "delim": {
-          "type": "integer",
-          "description": "Delimiter",
-          "bitLength": 16
-        },
-        "dataLength" : {
-          "type": "integer",
-          "description": "Bank number",
-          "bitLength": 16
-        },
-        "bank" : {
-          "type": "integer",
-          "description": "Bank number (string でかけるようにはなっていた）",
-          "bitLength": 32
-        },
-        "data" : {
-          "type": "integer",
-          "description": "Data",
-          "bitLength": 32
-        },
         "timeFrameId": { 
           "type": "integer", 
           "description": "Identifier for the time frame", 
@@ -72,11 +52,7 @@
           "bitLength": 32
         }
       },
-      "required": ["magic", "length", "hLength", "type", "timeFrameId", "numSource"]
+      "required": ["version","magic", "length", "hLength", "type", "timeFrameId", "numSource"]
     }
-  },
-  "oneOf": [
-    { "$ref": "#/definitions/v0" },
-    { "$ref": "#/definitions/v1" }
-  ]
+  }
 }

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "header",
   "type": "object",
-  "definitions": {
+  "properties": {
     "version": {
       "type": "integer",
       "description": "Version",
@@ -49,7 +49,7 @@
     "banks": {
       "type":"array",
       "items": {
-        "$ref": "header-extra-bank.json#/definitions/bank"
+        "$ref": "header-extra-bank.json#/properties/bank"
       }
     }
   }

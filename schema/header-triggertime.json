@@ -3,15 +3,18 @@
   "title": "TrgTimeHeader",
   "type": "object",
   "properties": {
+    "version" : {"$ref": "header-common.json#/definitions/version"},
     "magic": { "$ref": "header-common.json#/definitions/magic" },
     "length": { "$ref": "header-common.json#/definitions/length" },
     "headerLength": { "$ref": "header-common.json#/definitions/headerLength" },
     "type": { "$ref": "header-common.json#/definitions/type" }
   },
   "required": [
+    "version",
     "magic", 
     "length", 
     "headerLength", 
     "type"
   ]
 }
+

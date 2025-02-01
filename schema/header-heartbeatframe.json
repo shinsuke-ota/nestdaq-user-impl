@@ -3,12 +3,14 @@
   "title": "HeartbeatFrameHeader",
   "type": "object",
   "properties": {
-    "magic": { "$ref": "header-common.json#/definitions/magic" },
-    "length": { "$ref": "header-common.json#/definitions/length" },
-    "headerLength": { "$ref": "header-common.json#/definitions/headerLength" },
-    "type": { "$ref": "header-common.json#/definitions/type" }
+    "version" : {"$ref": "header-common.json#/definitions/version"},
+    "magic": { "$ref": "header-common.json#/properties/magic" },
+    "length": { "$ref": "header-common.json#/properties/length" },
+    "headerLength": { "$ref": "header-common.json#/properties/headerLength" },
+    "type": { "$ref": "header-common.json#/properties/type" }
   },
   "required": [
+    "version",
     "magic", 
     "length", 
     "headerLength", 
