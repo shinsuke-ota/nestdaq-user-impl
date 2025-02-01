@@ -6,5 +6,7 @@ lib64
 bin
 .vscode
 .DS_Store
-
+*.pdf
+*.png
+*.svg
 
