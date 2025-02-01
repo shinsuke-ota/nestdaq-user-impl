@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "FilterHeader",
+  "description": "Header for the output from Filter",
   "type": "object",
   "oneOf": [
     { "$ref": "#/definitions/v0" },

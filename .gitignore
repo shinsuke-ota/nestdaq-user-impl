@@ -1,7 +1,10 @@
 *~
-build
+html
+latex
+!build/Doxyfile
 lib64
 bin
 .vscode
+.DS_Store
 
 

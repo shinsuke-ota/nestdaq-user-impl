@@ -1,0 +1,12 @@
+div.image img {
+   // max-width: 1000px;
+   width: 100%;
+   height: auto;
+   // border: 5px solid orange;
+}
+
+
+
+object {
+   width: 100%;
+}

@@ -1,0 +1,16 @@
+DOXYFILE_ENCODING = UTF-8
+PROJECT_NAME = "NestDAQ User Implementation By SPADI Alliance (unofficial)"
+OUTPUT_DIRECTORY = 
+OUTPUT_LANGUAGE = Japanese-en
+ALIASES = 
+MARKDOWN_SUPPORT = YES
+GENERATE_HTML = YES
+HTML_OUTPUT = html
+INPUT = ../src/index.md ../src/header-summary.md ../src/header ../src ../../header/scripts/draw_bit_field.py
+INPUT_ENCODING = UTF-8
+FILE_PATTERNS = *.md *.pdf 
+IMAGE_PATH = ../src/header/png/ ../src/header/svg/ ../src/header/pdf/
+HTML_EXTRA_STYLESHEET = ../src/header/css/style.css
+HTML_EXTRA_FILES = 
+USE_MDFILE_AS_MAINPAGE = ../src/index.md
+SOURCE_BROWSER = YES

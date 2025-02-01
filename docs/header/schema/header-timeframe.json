@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "TimeFrameHeader",
+  "description": "Header for the time frame. In the version of 'v1, the frame contains the heartbeat delimiter if the type is META and the frame contains the time slice data.",
   "type": "object",
   "oneOf": [
     { "$ref": "#/definitions/v0" },
@@ -40,7 +41,11 @@
         "magic": { "$ref": "header-common.json#/definitions/magic" },
         "length": { "$ref": "header-common.json#/definitions/length" },
         "hLength": { "$ref": "header-common.json#/definitions/headerLength" },
-        "type": { "$ref": "header-common.json#/definitions/type" },
+        "type": { 
+          "$ref": "header-common.json#/definitions/type",
+          "description": "Type of the time frame (0: META, 1: SLICE)",
+          "enum": [0,1,2]
+        },
         "timeFrameId": { 
           "type": "integer", 
           "description": "Identifier for the time frame", 
@@ -48,7 +53,7 @@
         },
         "numSource": {
           "type": "integer",
-          "description": "Number of sources in the time frame (なくてもいいかも)",
+          "description": "Number of sources in the time frame",
           "bitLength": 32
         }
       },

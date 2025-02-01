@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "FileSinkHeader",
   "type": "object",
+  "description": "Header for the output from FileSink",
   "oneOf" : [
     { "$ref": "#/definitions/v0" },
     { "$ref": "#/definitions/v1" }

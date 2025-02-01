@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "SubTimeFrameHeader",
   "type": "object",
+  "description": "Header for the sub-time frame",
   "oneOf": [
     { "$ref": "#/definitions/v0" },
     { "$ref": "#/definitions/v1" }
@@ -27,12 +28,15 @@
         },
         "femType": { 
           "type": "integer", 
-          "description": "FEM type", 
-          "bitLength": 32 
+          "description": "FEM type (1: L_V1, 2: H / H_V1, 3: L/L_V2, 5: H_V3, 6: LV3)", 
+          "bitLength": 32,
+          "enum" : [
+            1, 2, 3, 5, 6
+          ]
         },
         "femId": { 
           "type": "integer", 
-          "description": "FEM ID", 
+          "description": "FEM ID (currently IP address of modules)", 
           "bitLength": 32 
         },
         "length": { 
@@ -72,10 +76,16 @@
       "type": "object",
       "properties": {
         "version" : {"$ref": "header-common.json#/definitions/version"},
-        "magic": { "$ref": "header-common.json#/definitions/magic" },
+        "magic": {
+          "$ref": "header-common.json#/definitions/magic"
+        },
         "length": { "$ref": "header-common.json#/definitions/length" },
         "headerLength": { "$ref": "header-common.json#/definitions/headerLength" },
-        "type": { "$ref": "header-common.json#/definitions/type" },
+        "type": { 
+          "$ref": "header-common.json#/definitions/type",
+          "description": "type of the structure (1: META)",
+          "enum": [1]
+        },
         "timeFrameId": { 
           "type": "integer", 
           "description": "Time frame ID", 
@@ -83,13 +93,14 @@
         },
         "femType": { 
           "type": "integer", 
-          "description": "FEM type", 
-          "bitLength": 32 
+          "description": "FEM type (1: L_V1, 2: H / H_V1, 3: L/L_V2, 5: H_V3, 6: LV3)", 
+          "bitLength": 32,
+          "enum": [1, 2, 3, 4, 5, 6]
         },
         "femId": { 
           "type": "integer", 
-          "description": "FEM ID", 
-          "bitLength": 32 
+          "description": "FEM ID (currently IP address of modules)", 
+          "bitLength": 32
         },
         "numMessages": { 
           "type": "integer", 

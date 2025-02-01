@@ -1,3 +1,27 @@
+"""
+@file draw_bit_field.py
+@brief Draws a bit field diagram from a JSON schema and outputs it in various formats.
+This script reads a JSON schema file and generates a visual representation of the bit fields defined in the schema.
+It supports resolving internal and external JSON references and can handle different schema versions.
+The output includes a bit field diagram in PDF, PNG, and SVG formats, as well as a Markdown file with property details.
+@section usage Usage
+@code{.sh}
+python draw_bit_field.py <input_file> [--output_dir <output_dir>] [--version <version>]
+@endcode
+@param input_file Path to the input JSON schema file.
+@param output_dir Path to the output directory (default: 'readme-header').
+@param version Schema version to use (e.g., v0, v1) (optional).
+@section dependencies Dependencies
+- json
+- matplotlib
+- os
+- argparse
+@section author Author
+Shinsuke OTA <ota@rcnp.osaka-u.ac.jp>
+@section date Date
+2023-10-06
+"""
+
 import json
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -7,7 +31,9 @@ import argparse
 # 引数を解析
 parser = argparse.ArgumentParser(description='Draw bit field diagram from JSON schema.')
 parser.add_argument('input_file', type=str, help='Path to the input JSON schema file')
-parser.add_argument('output_file', type=str, help='Path to the output diagram file')
+parser.add_argument('--output_dir', type=str, help='Path to the output directory', default='readme-header')
+
+#parser.add_argument('output_file', type=str, help='Path to the output diagram file')
 parser.add_argument('--version', type=str, help='Schema version to use (e.g., v0, v1)', default=None)
 args = parser.parse_args()
 
@@ -22,6 +48,8 @@ else:
     properties = schema['properties']
 
 # 参照を解決する関数
+
+
 def resolve_ref(ref):
     """
     Resolves a JSON reference to its corresponding property.
@@ -73,7 +101,7 @@ def calculate_bit_length(details):
 # 画像の設定
 bit_width = 10
 bit_height = 20
-margin = 1
+margin = 0.
 
 # ビット列の総数を計算
 total_bits = 0
@@ -85,7 +113,7 @@ rows = (total_bits + 63) // 64  # 64ビットごとに改行
 
 # キャンバスのサイズを設定
 fig_width = bit_width * 64 + margin * 2
-fig_height = (rows + 1) * bit_height + margin * 2
+fig_height = (rows + 1) * bit_height + margin * 2  # Adjust height for property names and descriptions
 
 # ビット列を描画するためのキャンバスを作成
 fig, ax = plt.subplots(figsize=(fig_width / 10, fig_height / 10))
@@ -159,6 +187,57 @@ for prop, details in properties.items():
         x = margin
         y -= bit_height
 
+# 出力ファイル名とディレクトリを設定
+output_md_dir = args.output_dir
+output_pdf_dir = output_md_dir + '/pdf'
+output_png_dir = output_md_dir + '/png'
+output_svg_dir = output_md_dir + '/svg'
+os.makedirs(output_pdf_dir, exist_ok=True)
+os.makedirs(output_png_dir, exist_ok=True)
+os.makedirs(output_svg_dir, exist_ok=True)
+os.makedirs(output_md_dir, exist_ok=True)
+
+if args.version:
+    base_filename = os.path.splitext(os.path.basename(args.input_file))[0] + f'-{args.version}'
+else:
+    base_filename = os.path.splitext(os.path.basename(args.input_file))[0]
+
+output_pdf_file = os.path.join(output_pdf_dir, base_filename + '.pdf')
+output_svg_file = os.path.join(output_svg_dir, base_filename + '.svg')
+output_png_file = os.path.join(output_png_dir, base_filename + '.png')
+output_small_png_file = os.path.join(output_png_dir, base_filename + '-s.png')
+output_md_file = os.path.join(output_md_dir, base_filename + '.md')
+
+# プロパティ名と description を Markdown として出力
+with open(output_md_file, 'w') as md_file:
+    title = schema.get('title', 'No Title')
+    if (args.version):
+        title = f"{title} ({args.version})"
+    description = schema.get('description', 'No Description')
+    md_file.write(f"# {title}\n\n")
+    md_file.write(f"{description}\n\n")
+    md_file.write("| Property Name | Bit Length | Description |\n")
+    md_file.write("|---------------|------------|-------------|\n")
+    for prop, details in properties.items():
+        description = details.get('description', '')
+        bit_length = details.get('bitLength', '')
+        if '$ref' in details:
+            details = resolve_ref(details['$ref'])
+            bit_length = details.get('bitLength', bit_length)
+            if description == '':
+                description = details.get('description', '')
+        md_file.write(f"| {prop} | {bit_length} | {description} |\n")
+    # Embed the PNG image in the Markdown file
+    relative_png_path = os.path.relpath(output_png_file, start=os.path.dirname(output_md_file))
+    relative_pdf_path = os.path.relpath(output_pdf_file, start=os.path.dirname(output_md_file))
+    relative_svg_path = os.path.relpath(output_svg_file, start=os.path.dirname(output_md_file))
+    md_file.write(f"\n![Bit Field Diagram]({relative_svg_path})\n")
+    # md_file.write(f"\n[Download PDF]({relative_pdf_path})\n")
+#    md_file.write(f"\n[![Bit Field Diagram]({relative_png_path})]({relative_small_png_path})\n")
+
 # 画像を保存
-plt.savefig(args.output_file, format='pdf')
+plt.savefig(output_pdf_file, format='pdf')
+plt.savefig(output_png_file, format='png')
+plt.savefig(output_svg_file, format='svg')
 plt.close()
+
