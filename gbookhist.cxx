@@ -183,7 +183,7 @@ void gHistTrig_clear()
 void gHistFlt(struct Filter::Header *pflt)
 {
 	
-	gHElapse->Fill(pflt->elapseTime);
+	gHElapse->Fill(pflt->elapsedTime);
 	gHNTrig->Fill(pflt->numTrigs);
 
 	return;

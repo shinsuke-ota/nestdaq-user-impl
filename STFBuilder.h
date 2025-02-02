@@ -9,6 +9,7 @@
 #include <queue>
 
 #include <fairmq/Device.h>
+#include "version.h"
 
 #include "AmQStrTdcData.h"
 
@@ -95,6 +96,10 @@ private:
   
     TimeFrameIdType fTimeFrameIdType;
     int32_t fSTFId{-1}; // 8-bit spill counter and 16-bit HB frame from heartbeat delimiter
+
+    #if VERSION_H >= 2
+    std::chrono::steady_clock::time_point fStart;
+    #endif
 
     bool mdebug;
     RecvBuffer fInputPayloads;

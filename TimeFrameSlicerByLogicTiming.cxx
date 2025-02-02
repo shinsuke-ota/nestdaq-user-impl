@@ -2,16 +2,21 @@
  * @file TimeFrameSlicerByLogicTiming
  * @brief Slice Timeframe by Logic timing for NestDAQ
  * @date Created : 2024-05-04 12:31:55 JST
- *       Last Modified : 2024-07-04 19:38:05 JST
+ *       Last Modified : 2025-02-02 18:10:54
  *
  * @author Shinsuke OTA <ota@rcnp.osaka-u.ac.jp>
  *
  */
+
+#include <chrono>
+
 #include "TimeFrameSlicerByLogicTiming.h"
 #include "fairmq/runDevice.h"
 
 #include "utility/MessageUtil.h"
 #include "UnpackTdc.h"
+
+#include "version.h"
 
 #define DEBUG 0
 
@@ -70,13 +75,25 @@ bool TimeFrameSlicerByLogicTiming::ConditionalRun()
 #if DEBUG   
    if (fDoCheck) LOG(info) << "Let's build";
 #endif   
-   std::chrono::system_clock::time_point sw_start, sw_end;
 
    
    FairMQParts inParts;
    FairMQParts outParts;
    if (Receive(inParts, fInputChannelName,0,1) <= 0) return true;
    // inParts should have at least two messages
+
+#if VERSION_H >= 2   
+   std::chrono::system_clock::time_point sw_start, sw_end;
+   // start stopwatch 
+   sw_start = std::chrono::steady_clock::now();
+
+   // calculate the message size
+   uint64_t inDataSize = 0;
+   for (auto &msg : inParts) {
+      inDataSize += msg->GetSize();
+   }  
+   uint64_t *ptrElapsedTime = nullptr;
+#endif   
 
 #if DEBUG   
    if (fDoCheck) {
@@ -161,6 +178,10 @@ bool TimeFrameSlicerByLogicTiming::ConditionalRun()
       auto tfh = (TimeFrame::Header*) &((*outdata)[0]);
       tfh->type = TimeFrame::META;
       tfh->length = outdata->size()*sizeof(copyUnit);
+#if VERSION_H >= 2
+      ptrElapsedTime = &tfh->elapsedTime;
+      tfh->inDataSize = inDataSize;
+#endif      
 
       /***********************************************************************
        * Prepare the slices 
@@ -327,6 +348,13 @@ bool TimeFrameSlicerByLogicTiming::ConditionalRun()
       // go to next
       fIdxHBF++;
    } // while 
+
+#if VERSION_H >= 2
+   // stop stopwatch
+   sw_end = std::chrono::steady_clock::now();
+   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(sw_end - sw_start);
+   *ptrElapsedTime = duration.count();
+#endif   
 
    ////////////////////////////////////////////////////
    // Transfer the data to dqm port

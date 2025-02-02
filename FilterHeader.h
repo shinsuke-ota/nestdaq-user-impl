@@ -4,8 +4,14 @@
 #include <cstdint>
 #include <sys/time.h>
 
+#include "version.h"
+
 namespace Filter {
-namespace v0 {
+    #if VERSION_H == 0
+    inline 
+    #endif
+    namespace v0 {
+
 // "NIOC-TLF" : little endian of "FLT-COIN"
 constexpr uint64_t MAGIC {0x4e494f43'2d544c46};
 
@@ -20,8 +26,10 @@ struct Header {
     uint64_t timeUSec    {0};
 };
 } //namespace v0
-
-inline namespace v1 {
+    #if VERSION_H == 1
+    inline 
+    #endif
+    namespace v1 {
 #pragma pack(4)
 
 // " IGOLTLF" : little endian of "FLTLOGI "
@@ -36,7 +44,7 @@ struct Header {
     uint32_t numTrigs    {0};
     uint32_t workerId    {0};
     uint32_t numMessages {0};
-    uint32_t elapseTime  {0};
+    uint32_t elapsedTime  {0};
     uint32_t reserve     {0xff00ff00};
     //struct timeval processTime {0, 0};
     uint64_t timeSec     {0};
@@ -71,6 +79,25 @@ struct TrgTime {
 
 #pragma pack()
 } //namespace v1
+
+#if VERSION_H == 2
+inline
+#endif
+namespace v2 {
+#pragma pack(4)
+struct Header : public v1::Header {
+    Header () {
+        hLength = sizeof(Header);
+        magic = v1::MAGIC | (2L << 56) ; // version 2 header
+    }
+    uint64_t elapsedTime; // elapsed time in microsecond
+    uint64_t inDataSize; // incoming data size 
+};
+using v1::TrgTime;
+using v1::TrgTimeHeader;
+
+#pragma pack()
+} //namespace v2
 
 } // namespace Filter
 

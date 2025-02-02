@@ -15,6 +15,10 @@
 #include "TimeFrameHeader.h"
 #include "TimeFrameBuilder.h"
 
+#include "version.h"
+
+
+
 //#include "AmQStrTdcData.h"
 
 namespace bpo = boost::program_options;
@@ -57,6 +61,12 @@ bool TimeFrameBuilder::ConditionalRun()
     // receive
     FairMQParts inParts;
     if (Receive(inParts, fInputChannelName, 0, 1) > 0) {
+#if VERSION_H >= 2        
+        // start stopwatch
+        std::chrono::steady_clock::time_point sw_start = std::chrono::steady_clock::now();
+#endif
+
+
         assert(inParts.Size() >= 2);
 
         //LOG(debug) << " received message parts size = " << inParts.Size() << std::endl;
@@ -96,11 +106,20 @@ bool TimeFrameBuilder::ConditionalRun()
 
         if (fTFBuffer.find(stfId) == fTFBuffer.end()) {
             fTFBuffer[stfId].reserve(fNumSource);
+#if VERSION_H >= 2
+            fSwStart[stfId] = sw_start;
+            fInDataSize[stfId] = 0;
+#endif
         }
         fTFBuffer[stfId].emplace_back(STFBuffer {std::move(inParts), std::chrono::steady_clock::now()});
+#if VERSION_H >= 2
+        fInDataSize[stfId] += inParts.Size();
+#endif        
 #if 0
         LOG(debug) << fTFBuffer[stfId].size() << " vs " << fNumSource;
 #endif
+
+
     }
 
 
@@ -139,6 +158,11 @@ bool TimeFrameBuilder::ConditionalRun()
                         return (!m) ? jinit : jinit + m->GetSize();
                     });
                 });
+                #if VERSION_H >= 2
+                // insert elapse time and incoming data size
+                h->elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(fSwStart[stfId] - std::chrono::steady_clock::now()).count();
+                h->inDataSize = fInDataSize[stfId];
+                #endif
 
                 // for dqm
                 if (dqmSocketExists) {
@@ -294,6 +318,10 @@ bool TimeFrameBuilder::ConditionalRun()
             // remove empty buffer
             if (tfBuf.empty()) {
                 itr = fTFBuffer.erase(itr);
+#if VERSION_H >= 2
+                fSwStart.erase(stfId);
+                fInDataSize.erase(stfId);                
+#endif                
             } else {
                 ++itr;
             }
@@ -383,6 +411,8 @@ void TimeFrameBuilder::InitTask()
 void TimeFrameBuilder::PostRun()
 {
     fTFBuffer.clear();
+    fSwStart.clear();
+    fInDataSize.clear();
     //fDiscarded.clear();
 
     int nrecv=0;

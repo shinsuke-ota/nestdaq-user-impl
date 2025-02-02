@@ -3,5 +3,7 @@ build
 lib64
 bin
 .vscode
-
+*.pdf
+*.png
+*.svg
 

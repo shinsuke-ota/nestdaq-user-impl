@@ -9,7 +9,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-
+#include "version.h"
 #include <fairmq/Device.h>
 
 
@@ -63,6 +63,10 @@ private:
     uint64_t fNumSend {0};
 
     std::unordered_map<uint32_t, std::vector<STFBuffer>> fTFBuffer;
+#if VERSION_H >= 2    
+    std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> fSwStart;
+    std::unordered_map<uint32_t, uint64_t> fInDataSize;
+#endif    
     //std::unordered_set<uint64_t> fDiscarded;
 
 };

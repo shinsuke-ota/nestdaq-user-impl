@@ -20,6 +20,8 @@
 #include "STFBuilder.h"
 #include "AmQStrTdcData.h"
 
+#include "version.h"
+
 namespace STF  = SubTimeFrame;
 
 //______________________________________________________________________________
@@ -279,6 +281,13 @@ void AmQStrTdcSTFBuilder::FinalizeSTF()
     stfHeader->timeUSec = curtime.tv_usec;
 
     stfHeader->type = fThrottlingOut || fThrottlingIn;
+
+    #if VERSION_H >= 2
+    stfHeader->elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(fStart - std::chrono::steady_clock::now()).count();
+    stfHeader->inDataSize = stfHeader->length;
+    fStart = std::chrono::steady_clock::now();
+    #endif
+
     
     fThrottlingOut = 0;
     fThrottlingIn  = 0;
@@ -314,6 +323,12 @@ bool AmQStrTdcSTFBuilder::HandleData(FairMQMessagePtr& msg, int index)
     //  std::for_each(reinterpret_cast<uint64_t*>(msg->GetData()),
     //		reinterpret_cast<uint64_t*>(msg->GetData() + msg->GetSize()),
     //		::HexDump{4});
+    #if VERSION_H >= 2
+    if (fStart == 0) {
+        fStart = std::chrono::steady_clock::now();
+    }
+    fInDataSize += msg->GetSize();
+    #endif
 
     BuildFrame(msg, index);
 

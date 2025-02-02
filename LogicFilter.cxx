@@ -129,11 +129,20 @@ private:
 		std::vector< std::vector<struct DataBlock> > &,
 		FairMQParts &,
 		int);
+#if VERSION_H < 2		
 	int AddFilterMessage(
 		FairMQParts &,
 		std::vector< std::vector<uint32_t> > &,
 		uint32_t,
 		uint32_t);
+#else
+	int AddFilterMessage(
+		FairMQParts & inPart,
+		std::vector< std::vector<uint32_t> > &,
+		uint32_t,
+		uint32_t,
+		uint32_t);
+#endif
 	
 	int MarkFlagSending(
 		std::vector< std::vector<struct DataBlock> > &block_map,
@@ -866,12 +875,20 @@ int LogicFilter::BuildHBF(
 	return 0;
 }
 
-
+#if VERSION_H < 2
 int LogicFilter::AddFilterMessage(
 	FairMQParts &outParts,
 	std::vector< std::vector<uint32_t> > &fltdata,
 	uint32_t elapse,
 	uint32_t tf_id)
+#else
+int LogicFilter::AddFilterMessage(
+	FairMQParts &outParts,
+	std::vector< std::vector<uint32_t> > &fltdata,
+	uint32_t elapse,
+	uint32_t tf_id,
+	uint32_t inDataSize)
+#endif	
 {
 	int flt_data_len = 0;
 
@@ -918,6 +935,12 @@ int LogicFilter::AddFilterMessage(
 	fltHeader->elapseTime = elapse;
 	fltHeader->timeSec = sec;
 	fltHeader->timeUSec = usec;
+#if VERSION_H >= 2
+	fltHeader->inDataSize = inDataSize;
+	fltHeader->elapsedTime = elapse;
+#endif
+
+
 	outParts.AddPart(MessageUtil::NewMessage(*this, std::move(fltHeader)));
 
 	flt_data_len += sizeof(struct Filter::Header);
@@ -1018,6 +1041,7 @@ bool LogicFilter::ConditionalRun()
 	int i_tf_msg_index = 0;
 	uint32_t tf_tf_id = 0;
 	std::chrono::system_clock::time_point sw_start, sw_end;
+	uint64_t inDataSize = 0;
 
 	if (Receive(inParts, fInputChannelName, 0, 1000) > 0) {
 		assert(inParts.Size() >= 2);
@@ -1033,6 +1057,7 @@ bool LogicFilter::ConditionalRun()
 		for(int i = 0 ; i < inParts.Size() ; i++) flag_sending.push_back(true);
 
 		for(int i = 0 ; i < inParts.Size() ; i++) {
+			inDataSize += inParts[i].GetSize();
 			auto tfHeader = reinterpret_cast<struct TimeFrame::Header *>(inParts[i].GetData());
 			if (tfHeader->magic == TimeFrame::MAGIC) {
 				// i_tfHeader = tfHeader;
@@ -1224,7 +1249,11 @@ bool LogicFilter::ConditionalRun()
 
 		//FilterHeader
 		//tf_len += AddFilterMessage(outParts, fltdata, elapse, tf_tf_id);
+#if VERSION_H < 2		
 		AddFilterMessage(outParts, fltdata, elapse, tf_tf_id);
+#else
+		AddFilterMessage(outParts, fltdata, elapse, tf_tf_id, inDataSize);
+#endif
 
 		//Copy SubTimeFrame
 		unsigned int msg_size = inParts.Size();

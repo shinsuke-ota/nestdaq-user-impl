@@ -3,9 +3,14 @@
 
 #include <cstdint>
 
+#include "version.h"
+
 namespace SubTimeFrame {
 
 // This format is temporary and should be updated.
+# if VERSION_H == 0
+inline
+#endif
 namespace v0 {
 
 // "DAEH-FTS" : little endian of "STF-HEAD"
@@ -37,7 +42,10 @@ struct Header {
 
 } // namespace v0
 
-inline namespace v1 {
+# if VERSION_H == 1
+inline
+#endif
+namespace v1 {
 
 // " EMITBUS" : little endian of "SUBTIME "
 constexpr uint64_t MAGIC  {0x00454d4954425553};
@@ -71,6 +79,34 @@ struct Header {
 };  
 
 } // namespace v1
+
+# if VERSION_H == 2
+inline
+#endif
+namespace v2 {
+    using v1::MAGIC;
+    using v1::TDC64H;
+    using v1::TDC64H_V1;
+    using v1::TDC64L;
+    using v1::TDC64L_V1;
+    using v1::TDC64L_V2;
+    using v1::TDC64H_V3;
+    using v1::TDC64L_V3;
+    using v1::INPUT_REG;
+    using v1::FLT_TDC;
+    using v1::NULDEV;
+    using v1::META;
+    #pragma pack(4)
+      struct Header : public v1::Header {
+        Header () {
+            hLength = sizeof(Header);
+            magic = MAGIC | (2L << 56) ; // version 2 header
+        }
+        uint64_t elapsedTime{0}; // elapsed time in microsecond
+        uint64_t inDataSize{0}; // incoming data size 
+      };
+    #pragma pack()
+} // namespace v2
 
 } // namespace SubTimeFrame
 
