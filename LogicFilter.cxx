@@ -940,9 +940,16 @@ int LogicFilter::AddFilterMessage(
 	fltHeader->elapsedTime = elapse;
 #endif
 
-
+#if VERSION_H >= 2
+        auto outdataptr = std::make_unique<std::vector<uint32_t>>();
+        auto outdata = outdataptr.get();
+        for (uint32_t i = 0, n = sizeof(fltHeader->hLength)/sizeof(uint32_t); i < n; ++i) {
+           outdata->push_back(*((uint32_t*)fltHeader.get()+i));
+        }
+        outParts.AddPart(MessageUtil::NewMessage(*this, std::move(outdataptr)));
+#else
 	outParts.AddPart(MessageUtil::NewMessage(*this, std::move(fltHeader)));
-
+#endif
 	flt_data_len += sizeof(struct Filter::Header);
 
 	//add FLT data

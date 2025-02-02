@@ -44,7 +44,7 @@ struct Header {
     uint32_t numTrigs    {0};
     uint32_t workerId    {0};
     uint32_t numMessages {0};
-    uint32_t elapsedTime  {0};
+    uint32_t elapseTime  {0};
     uint32_t reserve     {0xff00ff00};
     //struct timeval processTime {0, 0};
     uint64_t timeSec     {0};
@@ -93,8 +93,11 @@ struct Header : public v1::Header {
     uint64_t elapsedTime; // elapsed time in microsecond
     uint64_t inDataSize; // incoming data size 
 };
+   using v1::MAGIC;
+   using v1::TDC_MAGIC;
 using v1::TrgTime;
 using v1::TrgTimeHeader;
+   
 
 #pragma pack()
 } //namespace v2

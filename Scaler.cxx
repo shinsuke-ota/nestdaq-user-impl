@@ -301,8 +301,18 @@ bool Scaler::HandleData(FairMQParts& parts, int index)
   scHeader->timeSec    = stfHeader->timeSec;
   scHeader->timeUSec   = stfHeader->timeUSec;     
     
-    
-  FairMQMessagePtr tmsg = MessageUtil::NewMessage(*this, std::move(scHeader));
+    #if VERSION_H >= 2
+    auto outdataptr = std::make_unique<std::vector<uint32_t>>();
+    {
+       auto outdata = outdataptr.get();
+       for (uint32_t i = 0, n = sizeof(scHeader->hLength)/sizeof(uint32_t); i < n; ++i) {
+          outdata->push_back(*((uint32_t*)scHeader.get()+i));
+       }
+    }
+    FairMQMessagePtr tmsg  = MessageUtil::NewMessage(*this, std::move(outdataptr));
+    #else
+    FairMQMessagePtr tmsg = MessageUtil::NewMessage(*this, std::move(scHeader));
+    #endif
 
 #if 0
   auto n = tmsg->GetSize()/sizeof(uint64_t);      

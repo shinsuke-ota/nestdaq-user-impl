@@ -297,8 +297,16 @@ void AmQStrTdcSTFBuilder::FinalizeSTF()
     //  std::cout << "usec: "<< stfHeader->timeUSec << std::endl;
 
     // replace first element with STF header
+    #if VERSION_H >= 2
+    auto outdataptr = std::make_unique<std::vector<uint32_t>>();
+    auto outdata = outdataptr.get();
+    for (uint32_t i = 0, n = sizeof(stfHeader->hLength)/sizeof(uint32_t); i < n; ++i) {
+       outdata->push_back(*((uint32_t*)stfHeader.get()+i));
+    }
+    fWorkingPayloads->at(0) = MessageUtil::NewMessage(*this, std::move(outdataptr));
+    #else
     fWorkingPayloads->at(0) = MessageUtil::NewMessage(*this, std::move(stfHeader));
-
+    #endif
     fOutputPayloads.emplace(std::move(fWorkingPayloads));
 
     ++fSTFSequenceNumber;
@@ -324,10 +332,10 @@ bool AmQStrTdcSTFBuilder::HandleData(FairMQMessagePtr& msg, int index)
     //		reinterpret_cast<uint64_t*>(msg->GetData() + msg->GetSize()),
     //		::HexDump{4});
     #if VERSION_H >= 2
-    if (fStart == 0) {
+    if (fIsFirstCall) {
+        fIsFirstCall = false;
         fStart = std::chrono::steady_clock::now();
     }
-    fInDataSize += msg->GetSize();
     #endif
 
     BuildFrame(msg, index);

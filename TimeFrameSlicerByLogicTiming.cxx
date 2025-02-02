@@ -83,7 +83,7 @@ bool TimeFrameSlicerByLogicTiming::ConditionalRun()
    // inParts should have at least two messages
 
 #if VERSION_H >= 2   
-   std::chrono::system_clock::time_point sw_start, sw_end;
+   std::chrono::steady_clock::time_point sw_start, sw_end;
    // start stopwatch 
    sw_start = std::chrono::steady_clock::now();
 

@@ -176,7 +176,16 @@ bool TimeFrameBuilder::ConditionalRun()
                     }
                 }
                 // LOG(debug) << " length = " << h->length;
+#if VERSION_H >= 2
+                auto outdataptr = std::make_unique<std::vector<uint32_t>>();
+                auto outdata = outdataptr.get();
+                for (uint32_t i = 0, n = sizeof(h->hLength)/sizeof(uint32_t); i < n; ++i) {
+                   outdata->push_back(*((uint32_t*)h.get()+i));
+                }
+                outParts.AddPart(MessageUtil::NewMessage(*this, std::move(outdataptr)));
+#else
                 outParts.AddPart(MessageUtil::NewMessage(*this, std::move(h)));
+#endif
                 for (auto& stfBuf: tfBuf) {
                     for (auto& m: stfBuf.parts) {
                         outParts.AddPart(std::move(m));

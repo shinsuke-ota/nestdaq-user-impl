@@ -71,7 +71,7 @@ inline
          }
          uint64_t elapsedTime; // elapsed time in microsecond
          uint64_t inDataSize; // incoming data size 
-      }
+      };
       #pragma pack()
    }
    
